@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import at.general.Utils;
 import at.general.WriteConsole;
 
 /**
@@ -22,6 +23,7 @@ public class Array
     {
         testFirstDuplicate();
         testFirstNotRepeatingCharacter();
+        testRotateImage();
     }
 
     private static void testFirstDuplicate()
@@ -86,8 +88,42 @@ public class Array
             WriteConsole.writeConsole(String.valueOf(expectedValue), String.valueOf(output),
                 testValues, (expectedValue == output), timeElapsed);
         }
+        System.out.println("\n\r");
     }
 
+    private static void testRotateImage()
+    {
+        List<Object[]> testCases = new ArrayList<>();
+
+        testCases.add(new Object[]{new int[][]{{7,4,1}, {8,5,2}, {9,6,3}}, new int[][]{{1,2,3}, {4,5,6}, {7,8,9}}});
+        testCases.add(new Object[]{new int[][]{{1}}, new int[][]{{1}}});
+        testCases.add(new Object[]{new int[][]{{6,8,7,6,10},
+            {8,9,6,10,9},
+            {6,7,3,2,6},
+            {8,9,8,9,3},
+            {2,9,2,7,7}}, new int[][]{{10,9,6,3,7},
+            {6,10,2,9,7},
+            {7,6,3,8,2},
+            {8,9,7,9,9},
+            {6,8,6,8,2}}});
+
+
+        WriteConsole.writeConsoleTitle("rotateImage");
+
+        for (Object[] actualCase : testCases)
+        {
+            int[][] expectedValue = (int[][]) actualCase[0];
+            int[][] testValues = (int[][]) actualCase[1];
+
+            long start = System.nanoTime();
+            int[][] output = rotateImage(testValues);
+            long timeElapsed = System.nanoTime() - start;
+
+            WriteConsole.writeConsole(Arrays.deepToString(expectedValue), Arrays.deepToString(output),
+                Arrays.deepToString(testValues), Utils.compareArrays(expectedValue, output), timeElapsed);
+        }
+        System.out.println("\n\r");
+    }
 
     private static int firstDuplicate(int[] a) {
 
@@ -126,5 +162,18 @@ public class Array
         }
 
         return s.split("")[0].charAt(0);
+    }
+
+    private static int[][] rotateImage(int[][] a) {
+        int arrayLength = a.length;
+        int[][] result = new int[arrayLength][arrayLength];
+        for (int i = arrayLength-1; i >= 0; i--)
+        {
+            for (int j = 0; j < arrayLength; j++)
+            {
+                result[j][arrayLength - 1 - i] = a[i][j];
+            }
+        }
+        return result;
     }
 }
