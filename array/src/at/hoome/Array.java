@@ -3,8 +3,10 @@ package at.hoome;
 import java.util.ArrayList;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -25,6 +27,7 @@ public class Array
         testFirstNotRepeatingCharacter();
         testRotateImage();
         testSudoku();
+        testIsCryptSolution();
     }
 
     private static void testFirstDuplicate()
@@ -167,7 +170,58 @@ public class Array
         System.out.println("\n\r");
     }
 
+    private static void testIsCryptSolution()
+    {
+        List<Object[]> testCases = new ArrayList<>();
 
+        testCases.add(new Object[]{true, new Object[]{new String[]{"SEND",
+            "MORE",
+            "MONEY"},
+        new char[][]{
+            {'O','0'},
+            {'M','1'},
+            {'Y','2'},
+            {'E','5'},
+            {'N','6'},
+            {'D','7'},
+            {'R','8'},
+            {'S','9'}
+        }}});
+        testCases.add(new Object[]{false, new Object[]{new String[]{"TEN",
+            "TWO",
+            "ONE"},
+            new char[][]{
+                {'O','1'},
+                {'T','0'},
+                {'W','9'},
+                {'E','5'},
+                {'N','4'}
+        }}});
+        testCases.add(new Object[]{true, new Object[]{new String[]{"A",
+            "A",
+            "A"},
+            new char[][]{
+                {'A','0'}
+            }}});
+
+        WriteConsole.writeConsoleTitle("isCryptSolution");
+
+        for (Object[] actualCase : testCases)
+        {
+            boolean expectedValue = (boolean) actualCase[0];
+            Object[] testValues = (Object[]) actualCase[1];
+            String[] testCrypt = (String[]) testValues[0];
+            char[][] testSolution = (char[][]) testValues[1];
+
+            long start = System.nanoTime();
+            boolean output = isCryptSolution(testCrypt, testSolution);
+            long timeElapsed = System.nanoTime() - start;
+
+            WriteConsole.writeConsole(String.valueOf(expectedValue), String.valueOf(output),
+                Arrays.deepToString(testValues), expectedValue == output, timeElapsed);
+        }
+        System.out.println("\n\r");
+    }
 
     private static int firstDuplicate(int[] a) {
 
@@ -242,5 +296,57 @@ public class Array
         }
 
         return true;
+    }
+
+    private static boolean isCryptSolution(String[] crypt, char[][] solution) {
+        Map<String, Integer> solutionMap = getSolutionMap(solution);
+
+        long word1 = decode(crypt[0], solutionMap);
+        long word2 = decode(crypt[1], solutionMap);
+        long word3 = decode(crypt[2], solutionMap);
+
+        if (word1 == -1 || word2 == -1 || word3 == -1)
+        {
+            return false;
+        }
+
+        return ((word1 + word2) == word3);
+    }
+
+    private static long decode(String actWord, Map<String,Integer> solutionMap)
+    {
+        char[] actCharWord = actWord.toCharArray();
+
+        String decodedValue = "";
+
+        for (int i = 0; i < actCharWord.length; i++)
+        {
+            decodedValue += solutionMap.get(String.valueOf(actCharWord[i]));
+        }
+
+        String trimmedDecodedValue = decodedValue;
+        if (actWord.length() > 1)
+        {
+            trimmedDecodedValue = decodedValue.replaceFirst("^0+", "");
+        }
+
+        if (decodedValue.length() != trimmedDecodedValue.length())
+        {
+            return -1;
+        }
+
+        return Long.valueOf(decodedValue);
+    }
+
+    private static Map<String, Integer> getSolutionMap(char[][] solution)
+    {
+        Map<String, Integer> solutionMap = new HashMap<>();
+
+        for (int i = 0; i < solution.length; i++)
+        {
+            solutionMap.put(String.valueOf(solution[i][0]), Character.getNumericValue(solution[i][1]));
+        }
+
+        return solutionMap;
     }
 }
