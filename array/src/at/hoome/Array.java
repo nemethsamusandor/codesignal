@@ -24,6 +24,7 @@ public class Array
         testFirstDuplicate();
         testFirstNotRepeatingCharacter();
         testRotateImage();
+        testSudoku();
     }
 
     private static void testFirstDuplicate()
@@ -125,6 +126,49 @@ public class Array
         System.out.println("\n\r");
     }
 
+    private static void testSudoku()
+    {
+        List<Object[]> testCases = new ArrayList<>();
+
+        testCases.add(new Object[]{true, new char[][]{{'.','.','.','1','4','.','.','2','.'},
+            {'.','.','6','.','.','.','.','.','.'},
+            {'.','.','.','.','.','.','.','.','.'},
+            {'.','.','1','.','.','.','.','.','.'},
+            {'.','6','7','.','.','.','.','.','9'},
+            {'.','.','.','.','.','.','8','1','.'},
+            {'.','3','.','.','.','.','.','.','6'},
+            {'.','.','.','.','.','7','.','.','.'},
+            {'.','.','.','5','.','.','.','7','.'}}});
+
+        testCases.add(new Object[]{false, new char[][]{{'.', '.', '.', '.', '2', '.', '.', '9', '.'},
+            {'.', '.', '.', '.', '6', '.', '.', '.', '.'},
+            {'7', '1', '.', '.', '7', '5', '.', '.', '.'},
+            {'.', '7', '.', '.', '.', '.', '.', '.', '.'},
+            {'.', '.', '.', '.', '8', '3', '.', '.', '.'},
+            {'.', '.', '8', '.', '.', '7', '.', '6', '.'},
+            {'.', '.', '.', '.', '.', '2', '.', '.', '.'},
+            {'.', '1', '.', '2', '.', '.', '.', '.', '.'},
+            {'.', '2', '.', '.', '3', '.', '.', '.', '.'}}});
+
+        WriteConsole.writeConsoleTitle("sodoku");
+
+        for (Object[] actualCase : testCases)
+        {
+            boolean expectedValue = (boolean) actualCase[0];
+            char[][] testValues = (char[][]) actualCase[1];
+
+            long start = System.nanoTime();
+            boolean output = sudoku2(testValues);
+            long timeElapsed = System.nanoTime() - start;
+
+            WriteConsole.writeConsole(String.valueOf(expectedValue), String.valueOf(output),
+                Arrays.deepToString(testValues), expectedValue == output, timeElapsed);
+        }
+        System.out.println("\n\r");
+    }
+
+
+
     private static int firstDuplicate(int[] a) {
 
         Set<Integer> checkList = new HashSet<>();
@@ -164,7 +208,8 @@ public class Array
         return s.split("")[0].charAt(0);
     }
 
-    private static int[][] rotateImage(int[][] a) {
+    private static int[][] rotateImage(int[][] a)
+    {
         int arrayLength = a.length;
         int[][] result = new int[arrayLength][arrayLength];
         for (int i = arrayLength-1; i >= 0; i--)
@@ -175,5 +220,27 @@ public class Array
             }
         }
         return result;
+    }
+
+    // This is henry11 solution,  but I liked this more, because this is very cleaver and easy
+    private static boolean sudoku2(char[][] grid)
+    {
+        int n = grid.length;
+
+        Set<String> set = new HashSet<>();
+
+        for (int row = 0; row < n ; row++)
+        {
+            for (int col = 0; col < n; col++) {
+                if (grid[row][col] != '.' && !set.add(grid[row][col] + " in row " + row))
+                    return false;
+                if (grid[row][col] != '.' && !set.add(grid[row][col] + " in col " + col))
+                    return false;
+                if (grid[row][col] != '.' && !set.add(grid[row][col] + " in square " + row/3 + " " + col/3))
+                    return false;
+            }
+        }
+
+        return true;
     }
 }
